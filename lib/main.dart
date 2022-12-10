@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
+  generateBingoNumbers();
   runApp(const MyApp());
 }
 
@@ -62,14 +63,18 @@ List<int> generateBingoNumbers() {
   final bingoNumbers = [
     ...resourceB.sublist(0, 5),
     ...resourceI.sublist(0, 5),
-    ...resourceN.sublist(0, 5),
+    ...resourceN.sublist(0, 4),
     ...resourceG.sublist(0, 5),
     ...resource0.sublist(0, 5),
   ];
+
+  /// 必ず中央は0になる
+  bingoNumbers.insert(12, 0);
+  return bingoNumbers;
 }
 
 final resourceB = List.generate(15, (index) => index + 1);
 final resourceI = List.generate(15, (index) => index + 16);
 final resourceN = List.generate(15, (index) => index + 31);
-final resourceG = List.generate(15, (index) => index + 45);
-final resource0 = List.generate(15, (index) => index + 60);
+final resourceG = List.generate(15, (index) => index + 46);
+final resource0 = List.generate(15, (index) => index + 61);
