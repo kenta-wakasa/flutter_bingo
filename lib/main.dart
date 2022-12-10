@@ -520,7 +520,7 @@ class _LotteryPageState extends State<LotteryPage> {
                           Column(
                             children: [
                               Text(
-                                '${drawnNumbers.first}',
+                                '${drawnNumbers.reversed.first}',
                                 style:
                                     Theme.of(context).textTheme.displayMedium,
                               ),
@@ -531,7 +531,7 @@ class _LotteryPageState extends State<LotteryPage> {
                                   alignment: WrapAlignment.start,
                                   spacing: 8,
                                   children: [
-                                    ...drawnNumbers.map(
+                                    ...drawnNumbers.reversed.map(
                                       (e) => Text('$e'.padLeft(2, '0')),
                                     ),
                                   ],
