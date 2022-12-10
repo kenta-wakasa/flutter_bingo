@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "631045397300",
+    "project_id": "flutter-univ-bingo",
+    "storage_bucket": "flutter-univ-bingo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631045397300:android:6a1e57ec88b053c2f6a361",
+        "android_client_info": {
+          "package_name": "com.example.bingo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "631045397300-54uvedn5d8skb5661hmi4thu2fim03b3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxoOu9p_VCJIoCKVMs2n3VHMPM8LRtJGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "631045397300-54uvedn5d8skb5661hmi4thu2fim03b3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
