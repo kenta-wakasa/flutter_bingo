@@ -455,150 +455,164 @@ class _LotteryPageState extends State<LotteryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('room')
-              .doc(widget.roomId)
-              .collection('user')
-              .doc(widget.userId)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+      body: SingleChildScrollView(
+        child: Container(
+          height: 800,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('room')
+                  .doc(widget.roomId)
+                  .collection('user')
+                  .doc(widget.userId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-            final data = snapshot.data?.data();
+                final data = snapshot.data?.data();
 
-            if (data == null) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('「${widget.userId}」は存在しません'),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.go('/');
-                        },
-                        child: const Text('あらためてユーザーをつくる'),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            final myNumbers = (data['myNumbers'] as List? ?? [])
-                .map((e) => e as int)
-                .toList();
-
-            return StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('room')
-                    .doc(widget.roomId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  final data = snapshot.data?.data();
-
-                  if (data == null) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  final drawnNumbers = (data['drawnNumbers'] as List? ?? [])
-                      .map((e) => e as int)
-                      .toList();
+                if (data == null) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (drawnNumbers.isNotEmpty)
-                          Column(
-                            children: [
-                              Text(
-                                '${drawnNumbers.reversed.first}',
-                                style:
-                                    Theme.of(context).textTheme.displayMedium,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(32),
-                                child: Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.start,
-                                  alignment: WrapAlignment.start,
-                                  spacing: 8,
-                                  children: [
-                                    ...drawnNumbers.reversed.map(
-                                      (e) => Text('$e'.padLeft(2, '0')),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: 32),
-                        SizedBox(
-                          height: 400,
-                          child: GridView.count(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: 5,
-                            children: myNumbers
-                                .map(
-                                  (e) => Container(
-                                    alignment: Alignment.center,
-                                    color: drawnNumbers.contains(e)
-                                        ? Colors.amber
-                                        : Colors.blue[300],
-                                    child: Text(
-                                      '$e',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
+                        Text('「${widget.userId}」は存在しません'),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.go('/');
+                            },
+                            child: const Text('あらためてユーザーをつくる'),
                           ),
                         ),
-                        const SizedBox(height: 32),
-                        if (checkBINGO(myNumbers, drawnNumbers))
-                          Column(
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  FirebaseFirestore.instance
-                                      .collection('room')
-                                      .doc(widget.roomId)
-                                      .update({
-                                    'bingoUsers':
-                                        FieldValue.arrayUnion([widget.userId]),
-                                  });
-                                },
-                                child: Text(
-                                  'BINGOを宣言',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayMedium
-                                      ?.copyWith(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
                       ],
                     ),
                   );
-                });
-          }),
+                }
+
+                final myNumbers = (data['myNumbers'] as List? ?? [])
+                    .map((e) => e as int)
+                    .toList();
+
+                return StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('room')
+                        .doc(widget.roomId)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      final data = snapshot.data?.data();
+
+                      if (data == null) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      final drawnNumbers = (data['drawnNumbers'] as List? ?? [])
+                          .map((e) => e as int)
+                          .toList();
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (drawnNumbers.isNotEmpty)
+                              Column(
+                                children: [
+                                  Text(
+                                    '${drawnNumbers.reversed.first}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayMedium,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                      alignment: WrapAlignment.start,
+                                      spacing: 8,
+                                      children: [
+                                        ...drawnNumbers.reversed.map(
+                                          (e) => Text('$e'.padLeft(2, '0')),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const SizedBox(height: 32),
+                            SizedBox(
+                              height: 320,
+                              width: 320,
+                              child: GridView.count(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 5,
+                                children: myNumbers
+                                    .map(
+                                      (e) => Container(
+                                        alignment: Alignment.center,
+                                        color: drawnNumbers.contains(e)
+                                            ? Colors.amber
+                                            : Colors.blue[300],
+                                        child: Text(
+                                          '$e',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            if (checkBINGO(myNumbers, drawnNumbers))
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    width: 320,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                      ),
+                                      onPressed: () async {
+                                        FirebaseFirestore.instance
+                                            .collection('room')
+                                            .doc(widget.roomId)
+                                            .update({
+                                          'bingoUsers': FieldValue.arrayUnion(
+                                              [widget.userId]),
+                                        });
+                                      },
+                                      child: FittedBox(
+                                        child: Text(
+                                          'BINGOを宣言',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      );
+                    });
+              }),
+        ),
+      ),
     );
   }
 }
