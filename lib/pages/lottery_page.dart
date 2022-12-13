@@ -123,12 +123,14 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
                     ),
                     Transform.scale(
                       scale: sequenceAnimation!['scale'].value,
-                      child: Text(
-                        room.bingoUsers.last,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 120,
-                          color: Colors.white,
+                      child: FittedBox(
+                        child: Text(
+                          room.bingoUsers.last,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 120,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -136,9 +138,11 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
                       padding: const EdgeInsets.only(top: 320),
                       child: Transform.scale(
                         scale: sequenceAnimation!['bingo'].value,
-                        child: Text(
-                          'BINGO',
-                          style: Theme.of(context).textTheme.displayLarge,
+                        child: FittedBox(
+                          child: Text(
+                            'BINGO',
+                            style: Theme.of(context).textTheme.displayLarge,
+                          ),
                         ),
                       ),
                     ),
