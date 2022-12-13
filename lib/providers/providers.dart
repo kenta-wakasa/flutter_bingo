@@ -1,4 +1,3 @@
-import 'package:bingo/domains/bingo.dart';
 import 'package:bingo/domains/bingo_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,21 +91,4 @@ final participatingUsersProvider = StreamProvider.autoDispose.family(
         );
   },
   dependencies: [roomReferenceProvider],
-);
-
-final bingoProvider = StreamProvider.autoDispose.family(
-  (ref, BINGOUser bingoUser) {
-    final roomId = ref.watch(roomIdProvider);
-    return ref.watch(roomReferenceProvider(roomId)).snapshots().map((ds) {
-      final room = Room.fromFirestore(ds);
-      return BINGO(
-        myNumbers: bingoUser.myNumbers,
-        drawnNumbers: room.drawnNumbers,
-      );
-    });
-  },
-  dependencies: [
-    roomIdProvider,
-    roomReferenceProvider,
-  ],
 );

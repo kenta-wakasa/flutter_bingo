@@ -2,12 +2,11 @@ import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:bingo/constants/constants.dart';
+import 'package:bingo/domains/bingo_user.dart';
 import 'package:bingo/providers/providers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../domains/bingo.dart';
 
 class LotteryPage extends ConsumerStatefulWidget {
   const LotteryPage({
@@ -26,23 +25,19 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
   String get userId => widget.userId;
   String get roomId => widget.roomId;
 
+  DocumentReference get userRef =>
+      ref.read(roomReferenceProvider(roomId)).collection('user').doc(userId);
+
   Future<void> init() async {
-    final ds = await ref
-        .read(roomReferenceProvider(roomId))
-        .collection('user')
-        .doc(userId)
-        .get();
+    final ds = await userRef.get();
     if (ds.exists) {
       return;
     }
 
-    await ref
-        .watch(roomReferenceProvider(roomId))
-        .collection('user')
-        .doc(userId)
-        .set({
+    await userRef.set({
       'createdAt': FieldValue.serverTimestamp(),
-      'myNumbers': BINGO.generateBingoNumbers(),
+      'myNumbers': BINGOUser.generateBingoNumbers(),
+      'hitNumbers': [],
     });
   }
 
@@ -55,13 +50,9 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncValue = ref.watch(bingoUserProvider(userId));
-    final bingoUser = asyncValue.value;
-    if (bingoUser == null) {
-      return const Scaffold();
-    }
-    final bingo = ref.watch(bingoProvider(bingoUser)).value;
-    if (bingo == null) {
+    final bingoUser = ref.watch(bingoUserProvider(userId)).value;
+    final room = ref.watch(roomProvider(roomId)).value;
+    if (bingoUser == null || room == null) {
       return const Scaffold();
     }
 
@@ -73,11 +64,11 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (bingo.drawnNumbers.isNotEmpty)
+                  if (room.drawnNumbers.isNotEmpty)
                     Column(
                       children: [
                         Text(
-                          '${bingo.drawnNumbers.reversed.first}',
+                          '${room.drawnNumbers.reversed.first}',
                           style: Theme.of(context).textTheme.displayMedium,
                         ),
                         const SizedBox(height: 8),
@@ -88,8 +79,15 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
                             alignment: WrapAlignment.start,
                             spacing: 4,
                             children: [
-                              ...bingo.drawnNumbers.reversed.map(
-                                (e) => Text('$e'.padLeft(2, '0')),
+                              ...room.drawnNumbers.reversed.map(
+                                (e) {
+                                  if (e == 0) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  return Text(
+                                    '$e'.padLeft(2, '0'),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -112,19 +110,52 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
                             scrollDirection: Axis.horizontal,
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 5,
-                            children: bingo.myNumbers
+                            children: bingoUser.myNumbers
                                 .map(
-                                  (e) => Container(
-                                    alignment: Alignment.center,
-                                    color: bingo.drawnNumbers.contains(e)
-                                        ? Colors.amber
-                                        : Colors.blue[300],
-                                    child: Text(
-                                      '$e',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                  (e) => Material(
+                                    color: Colors.blue[300],
+                                    child: InkWell(
+                                      onTap: (room.drawnNumbers.contains(e) &&
+                                              !bingoUser.hitNumbers.contains(e))
+                                          ? () {
+                                              userRef.update({
+                                                'hitNumbers':
+                                                    FieldValue.arrayUnion([e]),
+                                              });
+                                            }
+                                          : null,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            if (e != 0)
+                                              Text(
+                                                '$e'.padLeft(2, '0'),
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            else
+                                              const Text(
+                                                'FREE',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            if (bingoUser.hitNumbers
+                                                .contains(e))
+                                              const Icon(
+                                                Icons.star,
+                                                color: Constants.secondlyColor,
+                                                size: 48,
+                                              )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -132,13 +163,13 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
                                 .toList(),
                           ),
                         ),
-                        ...bingo.checkBINGOLine().map((sets) {
+                        ...bingoUser.checkBINGOLine().map((sets) {
                           final Alignment alignment;
                           final double angle;
                           double scale = 1;
                           double thickness = 8;
                           dev.log(sets.toList().toString());
-                          switch (BINGO.bingoSetList.indexOf(sets)) {
+                          switch (BINGOUser.bingoSetList.indexOf(sets)) {
                             case 0:
                               alignment = const Alignment(0, 0.8);
                               angle = pi / 2;
@@ -218,7 +249,7 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
               ),
             ),
           ),
-          if (bingo.checkBINGO() &&
+          if (bingoUser.checkBINGO() &&
               ref
                       .watch(roomProvider(roomId))
                       .value
