@@ -83,14 +83,19 @@ class MyApp extends StatelessWidget {
               ),
           hintColor: Colors.white70,
           dialogTheme: const DialogTheme(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16))),
             backgroundColor: Constants.primaryColor,
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
+              elevation: 2,
+              shadowColor: Colors.white,
               textStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
