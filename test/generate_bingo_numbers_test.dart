@@ -5,13 +5,12 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:bingo/main.dart';
+import 'package:bingo/domains/bingo.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('BINGOカードの番号を生成する関数のテスト', () {
-    final numbers = generateBingoNumbers();
-
+    final numbers = BINGO.generateBingoNumbers();
     expect(numbers.length, 25);
     expect(numbers[12], 0);
   });
