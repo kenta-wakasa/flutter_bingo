@@ -7,6 +7,7 @@ import 'package:bingo/providers/providers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sequence_animation/flutter_sequence_animation.dart';
 
 class LotteryPage extends ConsumerStatefulWidget {
   const LotteryPage({
@@ -21,14 +22,44 @@ class LotteryPage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _LotteryPageState();
 }
 
-class _LotteryPageState extends ConsumerState<LotteryPage> {
+class _LotteryPageState extends ConsumerState<LotteryPage>
+    with SingleTickerProviderStateMixin {
   String get userId => widget.userId;
   String get roomId => widget.roomId;
 
   DocumentReference get userRef =>
       ref.read(roomReferenceProvider(roomId)).collection('user').doc(userId);
 
+  List<String> bingoUsers = [];
+  AnimationController? controller;
+  SequenceAnimation? sequenceAnimation;
   Future<void> init() async {
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+
+    sequenceAnimation = SequenceAnimationBuilder()
+        .addAnimatable(
+            animatable: Tween<double>(begin: 0, end: 1),
+            from: const Duration(milliseconds: 0),
+            to: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            tag: 'size')
+        .addAnimatable(
+            animatable: Tween<double>(begin: 8.0, end: 1.0),
+            from: const Duration(milliseconds: 200),
+            to: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            tag: 'scale')
+        .addAnimatable(
+            animatable: Tween<double>(begin: 0, end: 1.0),
+            from: const Duration(milliseconds: 200),
+            to: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            tag: 'bingo')
+        .animate(controller!);
+    setState(() {});
+    bingoUsers = (await ref.read(roomProvider(roomId).future)).bingoUsers;
+    setState(() {});
     final ds = await userRef.get();
     if (ds.exists) {
       return;
@@ -52,8 +83,85 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
   Widget build(BuildContext context) {
     final bingoUser = ref.watch(bingoUserProvider(userId)).value;
     final room = ref.watch(roomProvider(roomId)).value;
-    if (bingoUser == null || room == null) {
-      return const Scaffold();
+
+    // if (bingoUser == null || room == null) {
+    if (bingoUser == null ||
+        room == null ||
+        controller == null ||
+        sequenceAnimation == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (bingoUsers.length < room.bingoUsers.length) {
+      bingoUsers = room.bingoUsers;
+      controller?.forward(from: 0);
+
+      return GestureDetector(
+        child: Scaffold(
+          body: Align(
+            alignment: Alignment.centerRight,
+            child: AnimatedBuilder(
+              animation: controller!,
+              builder: (context, _) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Transform.scale(
+                      alignment: Alignment.centerRight,
+                      scaleY: 1,
+                      scaleX: sequenceAnimation!['size'].value,
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: 800,
+                        height: 160,
+                        color: Colors.red,
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: sequenceAnimation!['scale'].value,
+                      child: Text(
+                        room.bingoUsers.last,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 120,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 320),
+                      child: Transform.scale(
+                        scale: sequenceAnimation!['bingo'].value,
+                        child: Text(
+                          'BINGO',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: sequenceAnimation!['bingo'].value,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            bingoUsers = room.bingoUsers;
+                          });
+                        },
+                        child: Container(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -250,12 +358,7 @@ class _LotteryPageState extends ConsumerState<LotteryPage> {
             ),
           ),
           if (bingoUser.checkBINGO() &&
-              ref
-                      .watch(roomProvider(roomId))
-                      .value
-                      ?.bingoUsers
-                      .contains(userId) ==
-                  false)
+              room.bingoUsers.contains(userId) == false)
             Container(
               color: Colors.black54,
               alignment: Alignment.center,
