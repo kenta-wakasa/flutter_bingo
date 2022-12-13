@@ -78,7 +78,8 @@ class StartPage extends ConsumerWidget {
                       onPressed: () async {
                         final roomId = await InputDialog.show(
                           context,
-                          title: 'ルーム名を入力しましょう',
+                          title: 'ルーム名を入力しよう！',
+                          hintText: '簡単なワードにしよう',
                         );
                         if (roomId?.isEmpty ?? true) {
                           return;
@@ -128,7 +129,8 @@ class StartPage extends ConsumerWidget {
                       onPressed: () async {
                         final roomId = await InputDialog.show(
                           context,
-                          title: 'ルーム名を入力しましょう',
+                          title: 'ルーム名を入力しよう！',
+                          hintText: '主催者に確認しよう',
                         );
 
                         if (roomId?.isEmpty ?? true) {
@@ -154,8 +156,13 @@ class StartPage extends ConsumerWidget {
 
                         final userId = await InputDialog.show(
                           context,
-                          title: 'ユーザー名を入力しましょう',
+                          title: '名前を入力しよう！',
+                          hintText: 'ユニークな名前にしよう！',
                         );
+
+                        if (userId?.isEmpty ?? true) {
+                          return;
+                        }
 
                         context.go('/room/$roomId/user/$userId');
                       },

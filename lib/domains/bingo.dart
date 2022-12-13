@@ -42,7 +42,7 @@ class BINGO {
     /// まずはヒットしているindexの一覧が必要
 
     final hitIndexSet = <int>{};
-    for (var index = 0; index < 24; index++) {
+    for (var index = 0; index < 25; index++) {
       if (drawnNumbers.contains(myNumbers[index])) {
         hitIndexSet.add(index);
       }

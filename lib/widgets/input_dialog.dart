@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 
 class InputDialog extends StatefulWidget {
-  const InputDialog({super.key, required this.title});
+  const InputDialog({
+    super.key,
+    required this.title,
+    required this.hintText,
+  });
 
   final String title;
+  final String hintText;
 
-  static Future<String?> show(BuildContext context,
-      {required String title}) async {
+  static Future<String?> show(
+    BuildContext context, {
+    required String title,
+    required String hintText,
+  }) async {
     final result = await showDialog<String>(
-        context: context,
-        builder: (context) {
-          return InputDialog(title: title);
-        });
+      context: context,
+      builder: (context) {
+        return InputDialog(
+          title: title,
+          hintText: hintText,
+        );
+      },
+    );
     return result;
   }
 
@@ -34,7 +46,9 @@ class _InputDialogState extends State<InputDialog> {
       content: TextFormField(
         autofocus: true,
         controller: controller,
-        decoration: const InputDecoration(hintText: '簡単なワードにしましょう'),
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+        ),
         onFieldSubmitted: (text) {
           if (text.isEmpty) {
             Navigator.of(context).pop();

@@ -32,10 +32,8 @@ class RoomPage extends ConsumerWidget {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () async {
-                    final roomId = await InputDialog.show(
-                      context,
-                      title: 'ルーム名を入力しましょう',
-                    );
+                    final roomId = await InputDialog.show(context,
+                        title: 'ルーム名を入力しましょう', hintText: '');
                     if (roomId?.isEmpty ?? true) {
                       return;
                     }
@@ -45,11 +43,9 @@ class RoomPage extends ConsumerWidget {
 
                     /// ルームを作成する
                     // TODO(kenta-wakasa): IDが被っていた場合の処理
-                    await FirebaseFirestore.instance
-                        .collection('room')
-                        .doc(roomId)
-                        .set({
+                    ref.watch(roomReferenceProvider(roomId!)).set({
                       'randomNumbers': randomNumbers,
+                      'drawnNumbers': [0],
                       'createAt': FieldValue.serverTimestamp(),
                     });
 
