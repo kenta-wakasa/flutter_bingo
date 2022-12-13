@@ -19,6 +19,7 @@ dependencies:
   cloud_firestore: ^4.2.0
   collection: ^1.16.0
   flutter_riverpod: ^2.1.1
+  google_fonts: ^3.0.1
 
 dev_dependencies:
   flutter_test:

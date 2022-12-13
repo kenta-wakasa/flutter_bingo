@@ -12,100 +12,116 @@ class StartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 480,
+            minWidth: 320,
+          ),
           child: Column(
             children: [
-              Text(
-                'BINGO',
-                style: Theme.of(context).textTheme.displayLarge,
+              const Spacer(),
+              FittedBox(
+                child: Text(
+                  'BINGO',
+                  style: Theme.of(context).textTheme.displayLarge,
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final roomId = await InputDialog.show(
+                      context,
+                      title: 'ルーム名を入力しましょう',
+                    );
+                    if (roomId?.isEmpty ?? true) {
+                      return;
+                    }
+
+                    final randomNumbers =
+                        List.generate(75, (index) => index + 1)..shuffle();
+
+                    /// ルームを作成する
+                    // TODO(kenta-wakasa): IDが被っていた場合の処理
+
+                    final roomExits =
+                        await ref.watch(roomExistsProvider(roomId!).future);
+
+                    if (roomExits) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('「$roomId」はすでに存在しています'),
+                            content: const Text('別のIDをお試しください'),
+                          );
+                        },
+                      );
+                      return;
+                    }
+
+                    ref.watch(roomReferenceProvider(roomId)).set({
+                      'randomNumbers': randomNumbers,
+                      'drawnNumbers': [0],
+                      'createAt': FieldValue.serverTimestamp(),
+                    });
+
+                    context.go('/room/$roomId');
+
+                    /// 新規ルームを作る
+                  },
+                  child: const Text('新しくはじめる'),
+                ),
               ),
               const SizedBox(
-                height: 64,
+                height: 24,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final roomId = await InputDialog.show(
-                    context,
-                    title: 'ルーム名を入力しましょう',
-                  );
-                  if (roomId?.isEmpty ?? true) {
-                    return;
-                  }
-
-                  final randomNumbers = List.generate(75, (index) => index + 1)
-                    ..shuffle();
-
-                  /// ルームを作成する
-                  // TODO(kenta-wakasa): IDが被っていた場合の処理
-
-                  final roomExits =
-                      await ref.watch(roomExistsProvider(roomId!).future);
-
-                  if (roomExits) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('「$roomId」はすでに存在しています'),
-                          content: const Text('別のIDをお試しください'),
-                        );
-                      },
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final roomId = await InputDialog.show(
+                      context,
+                      title: 'ルーム名を入力しましょう',
                     );
-                    return;
-                  }
 
-                  ref.watch(roomReferenceProvider(roomId)).set({
-                    'randomNumbers': randomNumbers,
-                    'drawnNumbers': [0],
-                    'createAt': FieldValue.serverTimestamp(),
-                  });
+                    if (roomId?.isEmpty ?? true) {
+                      return;
+                    }
 
-                  context.go('/room/$roomId');
+                    // TODO(kenta-wakasa): そのルームが存在するかチェック
+                    final roomExists =
+                        await ref.watch(roomExistsProvider(roomId!).future);
 
-                  /// 新規ルームを作る
-                },
-                child: const Text('新しくビンゴを始める'),
+                    if (!roomExists) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('「$roomId」が見つかりませんでした'),
+                            content: const Text('ルーム名が間違っていませんか？'),
+                          );
+                        },
+                      );
+                      return;
+                    }
+
+                    final userId = await InputDialog.show(
+                      context,
+                      title: 'ユーザー名を入力しましょう',
+                    );
+
+                    context.go('/room/$roomId/user/$userId');
+                  },
+                  child: const Text('開催中のBINGOに参加する'),
+                ),
               ),
               const SizedBox(
-                height: 32,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  final roomId = await InputDialog.show(
-                    context,
-                    title: 'ルーム名を入力しましょう',
-                  );
-
-                  if (roomId?.isEmpty ?? true) {
-                    return;
-                  }
-
-                  // TODO(kenta-wakasa): そのルームが存在するかチェック
-                  final roomExists =
-                      await ref.watch(roomExistsProvider(roomId!).future);
-
-                  if (!roomExists) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('「$roomId」が見つかりませんでした'),
-                          content: const Text('ルーム名が間違っていませんか？'),
-                        );
-                      },
-                    );
-                    return;
-                  }
-
-                  final userId = await InputDialog.show(
-                    context,
-                    title: 'ユーザー名を入力しましょう',
-                  );
-
-                  context.go('/room/$roomId/user/$userId');
-                },
-                child: const Text('開催中のビンゴに参加する'),
+                height: 48,
               ),
             ],
           ),

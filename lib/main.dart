@@ -1,9 +1,11 @@
+import 'package:bingo/constants/constants.dart';
 import 'package:bingo/providers/providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'firebase_options.dart';
 import 'pages/lottery_page.dart';
@@ -72,6 +74,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      theme: ThemeData(
+          primaryColor: Constants.primaryColor,
+          colorScheme: ThemeData().colorScheme.copyWith(
+                primary: Constants.secondlyColor,
+                onPrimary: Colors.black87,
+                secondary: Constants.secondlyColor,
+              ),
+          hintColor: Colors.white70,
+          dialogTheme: const DialogTheme(
+            backgroundColor: Constants.primaryColor,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+              padding: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          textTheme: GoogleFonts.rocknRollOneTextTheme()
+              .copyWith(
+                displayLarge:
+                    GoogleFonts.rocknRollOneTextTheme().displayLarge?.copyWith(
+                          fontSize: 120,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+              )
+              .apply(
+                displayColor: Constants.secondlyColor,
+                bodyColor: Colors.white,
+              ),
+          scaffoldBackgroundColor: Constants.primaryColor),
       routeInformationProvider: _router.routeInformationProvider,
       routeInformationParser: _router.routeInformationParser,
       routerDelegate: _router.routerDelegate,
