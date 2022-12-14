@@ -42,7 +42,6 @@ class RoomPage extends ConsumerWidget {
                         List.generate(75, (index) => index + 1)..shuffle();
 
                     /// ルームを作成する
-                    // TODO(kenta-wakasa): IDが被っていた場合の処理
                     ref.watch(roomReferenceProvider(roomId!)).set({
                       'randomNumbers': randomNumbers,
                       'drawnNumbers': [0],

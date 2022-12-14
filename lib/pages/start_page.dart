@@ -89,7 +89,6 @@ class StartPage extends ConsumerWidget {
                             List.generate(75, (index) => index + 1)..shuffle();
 
                         /// ルームを作成する
-                        // TODO(kenta-wakasa): IDが被っていた場合の処理
 
                         final roomExits =
                             await ref.watch(roomExistsProvider(roomId!).future);
@@ -137,7 +136,6 @@ class StartPage extends ConsumerWidget {
                           return;
                         }
 
-                        // TODO(kenta-wakasa): そのルームが存在するかチェック
                         final roomExists =
                             await ref.watch(roomExistsProvider(roomId!).future);
 

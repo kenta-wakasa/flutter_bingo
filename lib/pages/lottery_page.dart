@@ -74,7 +74,6 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     init();
   }
