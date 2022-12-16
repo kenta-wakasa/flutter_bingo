@@ -32,6 +32,7 @@ class StartPage extends ConsumerWidget {
       );
     });
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           ...circles,

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../constants/constants.dart';
 import '../widgets/input_dialog.dart';
@@ -64,7 +65,27 @@ class RoomPage extends ConsumerWidget {
               child: Center(
                 child: Column(
                   children: [
-                    Text('ルーム名：$roomId'),
+                    InkWell(
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: FittedBox(
+                                  child: SizedBox(
+                                    height: 320,
+                                    width: 320,
+                                    child: QrImage(
+                                        foregroundColor: Colors.white,
+                                        data:
+                                            'https://flutter-univ-bingo.web.app/room/$roomId/new'),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      child: Text('ルーム名：$roomId をQRで共有'),
+                    ),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
