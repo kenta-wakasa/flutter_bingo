@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:bingo/constants/constants.dart';
@@ -60,6 +59,7 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
     setState(() {});
     bingoUsers = (await ref.read(roomProvider(roomId).future)).bingoUsers;
     setState(() {});
+
     final ds = await userRef.get();
     if (ds.exists) {
       return;
@@ -99,69 +99,67 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
       bingoUsers = room.bingoUsers;
       controller?.forward(from: 0);
 
-      return GestureDetector(
-        child: Scaffold(
-          body: Align(
-            alignment: Alignment.centerRight,
-            child: AnimatedBuilder(
-              animation: controller!,
-              builder: (context, _) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Transform.scale(
-                      alignment: Alignment.centerRight,
-                      scaleY: 1,
-                      scaleX: sequenceAnimation!['size'].value,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: 800,
-                        height: 160,
-                        color: Colors.red,
+      return Scaffold(
+        body: Align(
+          alignment: Alignment.centerRight,
+          child: AnimatedBuilder(
+            animation: controller!,
+            builder: (context, _) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  Transform.scale(
+                    alignment: Alignment.centerRight,
+                    scaleY: 1,
+                    scaleX: sequenceAnimation!['size'].value,
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 800,
+                      height: 160,
+                      color: Colors.red,
+                    ),
+                  ),
+                  Transform.scale(
+                    scale: sequenceAnimation!['scale'].value,
+                    child: FittedBox(
+                      child: Text(
+                        room.bingoUsers.last,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 120,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    Transform.scale(
-                      scale: sequenceAnimation!['scale'].value,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 320),
+                    child: Transform.scale(
+                      scale: sequenceAnimation!['bingo'].value,
                       child: FittedBox(
                         child: Text(
-                          room.bingoUsers.last,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 120,
-                            color: Colors.white,
-                          ),
+                          'BINGO',
+                          style: Theme.of(context).textTheme.displayLarge,
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 320),
-                      child: Transform.scale(
-                        scale: sequenceAnimation!['bingo'].value,
-                        child: FittedBox(
-                          child: Text(
-                            'BINGO',
-                            style: Theme.of(context).textTheme.displayLarge,
-                          ),
-                        ),
+                  ),
+                  Transform.scale(
+                    scale: sequenceAnimation!['bingo'].value,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          bingoUsers = room.bingoUsers;
+                        });
+                      },
+                      child: Container(
+                        color: Colors.transparent,
                       ),
                     ),
-                    Transform.scale(
-                      scale: sequenceAnimation!['bingo'].value,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            bingoUsers = room.bingoUsers;
-                          });
-                        },
-                        child: Container(
-                          color: Colors.transparent,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       );
@@ -279,7 +277,6 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
                           final double angle;
                           double scale = 1;
                           double thickness = 8;
-                          dev.log(sets.toList().toString());
                           switch (BINGOUser.bingoSetList.indexOf(sets)) {
                             case 0:
                               alignment = const Alignment(0, 0.8);
@@ -356,6 +353,114 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
                     ),
                   ),
                   const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ...room.bingoUsers.map((e) {
+                        final index = room.bingoUsers.indexOf(e);
+                        if (index < 5) {
+                          return Text('${index + 1}位:$e  ');
+                        }
+                        return const SizedBox.shrink();
+                      })
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  const Text('[参加者]'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Wrap(
+                      spacing: 4,
+                      children: [
+                        ...(ref
+                                    .watch(participatingUsersProvider(roomId))
+                                    .value ??
+                                [])
+                            .map((u) {
+                          return InkWell(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('${u.userId}のカード'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            height: 320,
+                                            width: 320,
+                                            child: GridView.count(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              crossAxisCount: 5,
+                                              children: u.myNumbers
+                                                  .map(
+                                                    (e) => Material(
+                                                      color: Colors.blue[300],
+                                                      child: Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Stack(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          children: [
+                                                            if (e != 0)
+                                                              Text(
+                                                                '$e'.padLeft(
+                                                                    2, '0'),
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              )
+                                                            else
+                                                              const Text(
+                                                                'FREE',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            if (u.hitNumbers
+                                                                .contains(e))
+                                                              const Icon(
+                                                                Icons.star,
+                                                                color: Constants
+                                                                    .secondlyColor,
+                                                                size: 48,
+                                                              )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            },
+                            child: Text(u.userId),
+                          );
+                        })
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

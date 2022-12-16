@@ -79,6 +79,7 @@ final bingoUserProvider = StreamProvider.autoDispose.family<BINGOUser, String>(
   ],
 );
 
+/// 参加者一覧
 final participatingUsersProvider = StreamProvider.autoDispose.family(
   (ref, String roomId) {
     return ref
@@ -86,9 +87,14 @@ final participatingUsersProvider = StreamProvider.autoDispose.family(
         .collection('user')
         .snapshots()
         .map(
-          (event) =>
-              event.docs.map((doc) => BINGOUser.fromFirestore(doc)).toList(),
-        );
+      (event) {
+        final bingoUsers =
+            event.docs.map((doc) => BINGOUser.fromFirestore(doc)).toList();
+        bingoUsers
+            .sort((b, a) => a.hitNumbers.length.compareTo(b.hitNumbers.length));
+        return bingoUsers;
+      },
+    );
   },
   dependencies: [roomReferenceProvider],
 );

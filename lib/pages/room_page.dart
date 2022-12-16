@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../constants/constants.dart';
 import '../widgets/input_dialog.dart';
 
 class RoomPage extends ConsumerWidget {
@@ -82,7 +83,10 @@ class RoomPage extends ConsumerWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: Text(
-                          '${room.drawnNumbers.reversed.first}'.padLeft(2, '0'),
+                          room.drawnNumbers.reversed.first == 0
+                              ? ''
+                              : '${room.drawnNumbers.reversed.first}'
+                                  .padLeft(2, '0'),
                           style: Theme.of(context).textTheme.displayLarge,
                         ),
                       ),
@@ -99,7 +103,9 @@ class RoomPage extends ConsumerWidget {
                               return FittedBox(
                                 child: Padding(
                                   padding: const EdgeInsets.all(4),
-                                  child: Text('$e'.padLeft(2, '0')),
+                                  child: e == 0
+                                      ? const Text('')
+                                      : Text('$e'.padLeft(2, '0')),
                                 ),
                               );
                             },
@@ -107,26 +113,115 @@ class RoomPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const Text('ビンゴ'),
-                    Wrap(
-                      spacing: 12,
-                      children: [
-                        ...room.bingoUsers.map((e) => Text(e)),
-                      ],
+                    const Text('[ビンゴ]'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Wrap(
+                        spacing: 4,
+                        children: [
+                          ...room.bingoUsers.map((e) => Text(e)),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('参加者'),
-                    ref.watch(participatingUsersProvider(roomId)).maybeWhen(
-                        orElse: () {
-                      return const SizedBox.shrink();
-                    }, data: (users) {
-                      return Wrap(
-                        spacing: 12,
+                    const Text('[参加者]'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Wrap(
+                        spacing: 4,
                         children: [
-                          ...users.map((e) => Text(e.userId)),
+                          ...(ref
+                                      .watch(participatingUsersProvider(roomId))
+                                      .value ??
+                                  [])
+                              .map((u) {
+                            return InkWell(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('${u.userId}のカード'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                              height: 320,
+                                              width: 320,
+                                              child: GridView.count(
+                                                shrinkWrap: true,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                crossAxisCount: 5,
+                                                children: u.myNumbers
+                                                    .map(
+                                                      (e) => Material(
+                                                        color: Colors.blue[300],
+                                                        child: Container(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Stack(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            children: [
+                                                              if (e != 0)
+                                                                Text(
+                                                                  '$e'.padLeft(
+                                                                      2, '0'),
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        20,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                )
+                                                              else
+                                                                const Text(
+                                                                  'FREE',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                              if (u.hitNumbers
+                                                                  .contains(e))
+                                                                const Icon(
+                                                                  Icons.star,
+                                                                  color: Constants
+                                                                      .secondlyColor,
+                                                                  size: 48,
+                                                                )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                              },
+                              child: Text(u.userId),
+                            );
+                          })
                         ],
-                      );
-                    }),
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:bingo/constants/constants.dart';
+import 'package:bingo/pages/new_user_page.dart';
 import 'package:bingo/providers/providers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,16 @@ final _router = GoRouter(
         );
       }),
       routes: [
+        GoRoute(
+          path: 'new',
+          pageBuilder: ((context, state) {
+            return NoTransitionPage(
+              child: NewUserPage(
+                roomId: state.params['rid']!,
+              ),
+            );
+          }),
+        ),
         GoRoute(
           path: 'user/:uid',
           pageBuilder: ((context, state) {
