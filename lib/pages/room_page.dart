@@ -145,70 +145,75 @@ class RoomPage extends ConsumerWidget {
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            SizedBox(
-                                              height: 320,
-                                              width: 320,
-                                              child: GridView.count(
-                                                shrinkWrap: true,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                crossAxisCount: 5,
-                                                children: u.myNumbers
-                                                    .map(
-                                                      (e) => Material(
-                                                        color: Colors.blue[300],
-                                                        child: Container(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Stack(
+                                            FittedBox(
+                                              child: SizedBox(
+                                                height: 320,
+                                                width: 320,
+                                                child: GridView.count(
+                                                  shrinkWrap: true,
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  crossAxisCount: 5,
+                                                  children: u.myNumbers
+                                                      .map(
+                                                        (e) => Material(
+                                                          color:
+                                                              Colors.blue[300],
+                                                          child: Container(
                                                             alignment: Alignment
                                                                 .center,
-                                                            children: [
-                                                              if (e != 0)
-                                                                Text(
-                                                                  '$e'.padLeft(
-                                                                      2, '0'),
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .white,
+                                                            child: Stack(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              children: [
+                                                                if (e != 0)
+                                                                  Text(
+                                                                    '$e'.padLeft(
+                                                                        2, '0'),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                  )
+                                                                else
+                                                                  const Text(
+                                                                    'FREE',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
                                                                   ),
-                                                                )
-                                                              else
-                                                                const Text(
-                                                                  'FREE',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                                ),
-                                                              if (u.hitNumbers
-                                                                  .contains(e))
-                                                                const Icon(
-                                                                  Icons.star,
-                                                                  color: Constants
-                                                                      .secondlyColor,
-                                                                  size: 48,
-                                                                )
-                                                            ],
+                                                                if (u.hitNumbers
+                                                                    .contains(
+                                                                        e))
+                                                                  const Icon(
+                                                                    Icons.star,
+                                                                    color: Constants
+                                                                        .secondlyColor,
+                                                                    size: 48,
+                                                                  )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    )
-                                                    .toList(),
+                                                      )
+                                                      .toList(),
+                                                ),
                                               ),
                                             ),
                                           ],
