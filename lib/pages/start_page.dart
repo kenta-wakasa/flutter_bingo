@@ -78,11 +78,12 @@ class StartPage extends ConsumerWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         final roomId = await InputDialog.show(
-                          context,
-                          title: 'ルーム名を入力しよう！',
-                          hintText: '簡単なワードにしよう',
-                        );
-                        if (roomId?.isEmpty ?? true) {
+                              context,
+                              title: 'ルーム名を入力しよう！',
+                              hintText: '簡単なワードにしよう',
+                            ) ??
+                            '';
+                        if (roomId.isEmpty) {
                           return;
                         }
 
@@ -92,7 +93,7 @@ class StartPage extends ConsumerWidget {
                         /// ルームを作成する
 
                         final roomExits =
-                            await ref.watch(roomExistsProvider(roomId!).future);
+                            await ref.watch(roomExistsProvider(roomId).future);
 
                         if (roomExits) {
                           showDialog(
