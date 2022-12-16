@@ -353,17 +353,16 @@ class _LotteryPageState extends ConsumerState<LotteryPage>
                     ),
                   ),
                   const SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ...room.bingoUsers.map((e) {
-                        final index = room.bingoUsers.indexOf(e);
-                        if (index < 5) {
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Wrap(
+                      children: [
+                        ...room.bingoUsers.map((e) {
+                          final index = room.bingoUsers.indexOf(e);
                           return Text('${index + 1}位:$e  ');
-                        }
-                        return const SizedBox.shrink();
-                      })
-                    ],
+                        })
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   const Text('[参加者]'),
